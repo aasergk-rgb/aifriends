@@ -47,5 +47,5 @@ https://fish.audio で好きな声を探し、そのページURL末尾のIDを `
 |---|---|
 | `lib/core.js` | 本体: `/api/chat`(Gemini) `/api/memory`(記憶抽出) `/api/tts`(Fish Audio) と合言葉チェック |
 | `api/*.js` | Vercel Functions（`lib/core.js` を呼ぶだけ） |
-| `server.js` | ローカル開発用サーバー（`npm start`） |
+| `dev-server.js` | ローカル開発用サーバー（`npm start`） |
 | `public/` | チャットUI（HTML/CSS/JS） |
