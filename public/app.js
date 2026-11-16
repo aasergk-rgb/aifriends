@@ -28,6 +28,23 @@ let ttsEnabled = true;
 let busy = false;
 let turnsSinceMemory = 0;
 let currentAudio = null;
+let appPassword = store.get('appPassword', '');
+
+// 合言葉付きで API を呼ぶ。401 なら合言葉を聞き直して再試行
+async function api(path, payload) {
+  for (let i = 0; i < 3; i++) {
+    const res = await fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-app-password': appPassword },
+      body: JSON.stringify(payload),
+    });
+    if (res.status !== 401) return res;
+    const pw = prompt(i ? '合言葉が違います。もう一度入力してください' : '合言葉を入力してください');
+    if (pw === null) return res;
+    appPassword = pw; store.set('appPassword', pw);
+  }
+  throw new Error('合言葉が違います');
+}
 
 // ---------- 表示 ----------
 function render() {
@@ -80,11 +97,7 @@ async function send(text) {
   const typing = showTyping();
   setStatus('入力中…');
   try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, profile }),
-    });
+    const res = await api('/api/chat', { messages, profile });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || res.statusText);
     typing.remove();
@@ -111,11 +124,7 @@ async function maybeUpdateMemory() {
   if (turnsSinceMemory < 4) return;
   turnsSinceMemory = 0;
   try {
-    const res = await fetch('/api/memory', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: messages.slice(-12), memories: profile.memories || [], userName: profile.userName || 'ユーザー' }),
-    });
+    const res = await api('/api/memory', ({ messages: messages.slice(-12), memories: profile.memories || [], userName: profile.userName || 'ユーザー' }));
     const data = await res.json();
     if (res.ok && Array.isArray(data.memories)) {
       profile.memories = data.memories;
@@ -134,11 +143,7 @@ async function speak(text) {
   stopAudio();
   try {
     setStatus('話し中…');
-    const res = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voiceId: profile.voiceId }),
-    });
+    const res = await api('/api/tts', { text, voiceId: profile.voiceId });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
       throw new Error(data.error || res.statusText);
@@ -251,5 +256,9 @@ $('resetBtn').onclick = () => {
 // ---------- 起動 ----------
 fetch('/api/config').then((r) => r.json()).then((c) => {
   ttsEnabled = !!c.ttsEnabled;
+  if (c.passwordRequired && !appPassword) {
+    appPassword = prompt('合言葉を入力してください') || '';
+    store.set('appPassword', appPassword);
+  }
   render();
 }).catch(render);
