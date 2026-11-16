@@ -1,0 +1,10 @@
+{
+  "name": "ai-best-friend",
+  "version": "1.0.0",
+  "description": "AI Best Friend - Gemini で会話し Fish Audio で喋る親友AI",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": { "node": ">=18" }
+}

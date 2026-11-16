@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cut">
+  <title>AI Best Friend</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="avatar" id="avatar" aria-hidden="true">🫶</div>
+    <div class="who">
+      <div class="name" id="friendNameLabel">ハル</div>
+      <div class="status" id="status">オンライン</div>
+    </div>
+    <button class="icon" id="voiceToggle" title="音声のオン/オフ">🔊</button>
+    <button class="icon" id="settingsBtn" title="設定">⚙️</button>
+  </header>
+
+  <main id="chat" aria-live="polite"></main>
+
+  <form id="composer" autocomplete="off">
+    <button type="button" class="icon mic" id="micBtn" title="話しかける">🎤</button>
+    <textarea id="input" rows="1" placeholder="メッセージを入力…"></textarea>
+    <button type="submit" class="send" id="sendBtn">送信</button>
+  </form>
+
+  <dialog id="settings">
+    <form method="dialog" id="settingsForm">
+      <h2>設定</h2>
+      <label>親友の名前<input name="friendName" maxlength="20"></label>
+      <label>あなたの呼ばれ方<input name="userName" maxlength="20"></label>
+      <label>親友の性格<textarea name="personality" rows="3"></textarea></label>
+      <label>Fish Audio 声モデルID<input name="voiceId" placeholder="空欄ならサーバーの既定値"></label>
+      <label class="row"><input type="checkbox" name="handsFree"> ハンズフリー（返事のあと自動でマイクON）</label>
+      <details>
+        <summary>覚えていること（<span id="memCount">0</span>件）</summary>
+        <textarea name="memories" rows="6" placeholder="1行に1つ"></textarea>
+      </details>
+      <div class="actions">
+        <button type="button" id="resetBtn" class="danger">会話をリセット</button>
+        <span class="spacer"></span>
+        <button value="cancel" formnovalidate>キャンセル</button>
+        <button value="save" class="primary">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
